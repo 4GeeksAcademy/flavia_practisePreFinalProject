@@ -31,5 +31,6 @@ class Actor(db.Model):
         return {
             "id": self.id,
             "nombre": self.nombre,
+            "nacionalidad": self.nacionalidad
             # do not serialize the password, its a security breach
         }
