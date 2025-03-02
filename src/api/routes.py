@@ -57,10 +57,10 @@ def get_all_actors():
     return jsonify(results), 200
 
 
-@api.route('/actors/<int:actors_id>', methods=['GET'])
-def get_actor(actors_id):
+@api.route('/actors/<int:actor_id>', methods=['GET'])
+def get_actor(actor_id):
 
-    single_actor = Actor.query.get(actors_id)
+    single_actor = Actor.query.get(actor_id)
     print("senza serialize", single_actor)
     print("con serialize", single_actor.serialize())
 
@@ -82,3 +82,38 @@ def add_actor():
     db.session.commit()
 
     return jsonify({"message" : "actor successfully added"}), 201            # 201 per created
+
+
+@api.route('/actors/<int:actor_id>', methods=['DELETE'])
+def delete_actor(actor_id):
+
+    actor = Actor.query.get(actor_id)         #Cerca l'attore nel database
+
+    if not actor:
+        return jsonify({"error": "Actor not found"}), 404             
+    
+    db.session.delete(actor)
+    db.session.commit()
+
+    return jsonify ({"message": f"Actor {actor.nombre} successfully deleted"}), 200
+
+
+@api.route('/actors/<int:actor_id>', methods=['PUT'])
+def modify_actor(actor_id):
+
+    actor = Actor.query.get(actor_id)
+
+    if not actor:
+        return jsonify({"error": "Actor not found"}), 404        
+
+    nombre = request.json.get("nombre", None)
+    nacionalidad = request.json.get("nacionalidad", None)
+
+    if nombre :                                                # Se i nuovi dati sono forniti, aggiorna i campi dell'attore. actor.nombre rappresente il nome gia presente, mentre nombre il nome della req HTTP
+        actor.nombre = nombre
+    if nacionalidad :
+        actor.nacionalidad = nacionalidad 
+
+    db.session.commit()
+
+    return jsonify ({"message": "Actor successfully modified"}), 200
